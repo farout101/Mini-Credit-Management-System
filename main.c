@@ -7,7 +7,6 @@
 #include "avl_tree.h"
 #include "encryption.h"
 
-
 #define INITIAL_CREDITS 100
 #define INITIAL_ADMIN_CREDITS 500
 
@@ -32,7 +31,7 @@ struct Transition
 
 char transitionfile[20] = "transition.txt";
 char datafile[20] = "data.txt";
-const char* key = "encryptionKey";
+const char *key = "daKeyxD";
 
 struct User users[50];
 struct Transition transitions[500];
@@ -45,17 +44,17 @@ int isNumeric(const char *str);
 void createFile(const char *file_name);
 int isStrongPassword(const char *password);
 int emailChecker(const char *username);
-void shareCredits(struct User *sender, struct User *receiver);
-void registration();
+void shareCredits(struct User *sender, struct User *receiver); // dar pyin ya ml
+void registration(); 
 int login();
 void readFile(const char *file_name);
-void appendFile(const char *file_name, struct User *user);
-void loadUserData(const char *file_name);
-void deleteUser();
-void banUser();
-void unbanUser();
+void appendFile(const char *file_name, struct User *user); // dar pyin ya ml
+void loadUserData(const char *file_name); 
+void deleteUser(); // dar pyin ya ml
+void banUser(); // dar pyin ya ml
+void unbanUser(); // dar pyin ya ml
 int isValidPhoneNumber(const char *phoneNumber);
-void appendTransitionFile(const char *file_name, struct Transition *transition);
+void appendTransitionFile(const char *file_name, struct Transition *transition); // dar pyin ya ml
 void loadTransitionData(const char *file_name);
 // End of declaration
 
@@ -404,7 +403,7 @@ void readFile(const char *file_name)
     }
 
     fclose(file);
-}
+} 
 
 int isStrongPassword(const char *password)
 {
@@ -680,7 +679,8 @@ void registration()
                 }
 
                 printf("Current credit of [%s] : %.2lf\n", users[userCount].name, users[userCount].credits);
-                // printf("The original password : %s \n", password); 
+
+                // printf("The original password : %s \n", password);
                 // printf("The encrypted password : %s \n", encrypPASS); test cases isn't necessary
 
                 appendFile(datafile, &users[userCount]);
