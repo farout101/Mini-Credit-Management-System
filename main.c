@@ -122,7 +122,7 @@ int main()
                         printf("--Admin Menu--\n\n");
 
                         printf("Current credit : %.2lf\n", users[loggedInUserIndex].credits);
-                        printf("\n1. to share\n2. to delete user\n3. to ban user\n4. to unban user\n5. to logout\nEnter your choice : ");
+                        printf("\n1. to share\n2. to delete user\n3. to ban user\n4. to unban user\n5. to Refresh Data\n6. to logout\nEnter your choice : ");
                         scanf(" %[^\n]", option);
 
                         if (strcmp(option, "1") == 0)
@@ -176,6 +176,21 @@ int main()
                         if (strcmp(option, "5") == 0)
                         {
                             system("cls");
+
+                            struct User **sortedUsersToadd = sortUsers(users, userCount);
+                            struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
+
+                            appendFile(datafile, sortedUsersToadd, userCount);
+                            appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
+
+                            free(sortedUsers);
+                            free(sortedTransitions);
+
+                            continue;
+                        }
+                        if (strcmp(option, "6") == 0)
+                        {
+                            system("cls");
                             printf("You have logged out!\n");
                             loggedInUserIndex = -1; // Set loggedInUserIndex to -1 to stay in the main loop
                             break;
@@ -188,7 +203,7 @@ int main()
                             continue;
                         }
 
-                    } while (strcmp(option, "5") != 0);
+                    } while (strcmp(option, "6") != 0);
                 }
                 else
                 {
@@ -198,7 +213,7 @@ int main()
 
                         char option[50];
                         printf("Current credit : %.2lf\n", users[loggedInUserIndex].credits);
-                        printf("\n1. to share\n2. to logout\nEnter your choice : ");
+                        printf("\n1. to share\n2. to Refresh Data\n3. to logout\nEnter your choice : ");
                         scanf(" %[^\n]", option);
 
                         if (strcmp(option, "1") == 0)
@@ -230,20 +245,37 @@ int main()
                                 continue;
                             }
                         }
-                        else if (strcmp(option, "2") == 0)
+
+                        else if (strcasecmp(option, "2") == 0)
+                        {
+                            system("cls");
+
+                            struct User **sortedUsersToadd = sortUsers(users, userCount);
+                            struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
+
+                            appendFile(datafile, sortedUsersToadd, userCount);
+                            appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
+
+                            free(sortedUsers);
+                            free(sortedTransitions);
+
+                            continue;
+                        }
+                        else if (strcmp(option, "3") == 0)
                         {
                             system("cls");
                             printf("You have logged out!\n");
                             loggedInUserIndex = -1; // Set loggedInUserIndex to -1 to stay in the main loop
                             break;
                         }
+
                         else
                         {
                             system("cls");
                             printf("Invalid choice. Please try again. \n");
                             continue;
                         }
-                    } while (strcmp(option, "2") != 0);
+                    } while (strcmp(option, "3") != 0);
                 }
             }
             continue;
@@ -894,7 +926,7 @@ void banUser()
 
     printf("---Ban User---\n\n");
 
-    printf("Enter the username to ban : ");
+    printf("Enter the email to ban : ");
     scanf(" %[^\n]", username);
 
     // FILE *tempFile = fopen("tempfile.txt", "w");
@@ -972,13 +1004,14 @@ void unbanUser()
     printf("<---Unban User--->\n\n");
     printf("Enter email to unban : ");
     scanf(" %[^\n]", username);
-    FILE *tempFile = fopen("tempfile.txt", "w");
-    if (tempFile == NULL)
-    {
-        system("cls");
-        printf("Error creating temporary file.\n");
-        return;
-    }
+
+    // FILE *tempFile = fopen("tempfile.txt", "w");
+    // if (tempFile == NULL)
+    // {
+    //     system("cls");
+    //     printf("Error creating temporary file.\n");
+    //     return;
+    // }
 
     int userUnbanned = 0;
     int search_tracker = 0;
