@@ -17,6 +17,8 @@
         <section id="about">
             <h2>About</h2>
             <p>Just a simplified version of the Mini Banking system.</p>
+            <p>In the data storage aspect, I aim to enhance the program's performance by minimizing the frequency of saving data. <br>
+                To achieve this, I introduced a 'refresh' function and opted to save data only at the very end.</p>
         </section>
         <section id="features">
             <h2>Features</h2>
