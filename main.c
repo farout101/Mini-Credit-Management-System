@@ -89,7 +89,7 @@ int main()
     {
         printf("\n---Welcome to Credit Management System---\n");
 
-        printf("\n1. to Login\n2. to Register\n3. to Exit");
+        printf("\n1. to Login\n2. to Register\n3. to Refresh Data\n4. to Exit");
         printf("\nEnter your choice : ");
         scanf(" %[^\n]", choice);
 
@@ -255,8 +255,23 @@ int main()
         if (strcmp(choice, "3") == 0)
         {
             system("cls");
-            printf("UserCount : %d \n",userCount);
-            printf("TransitionCount : %d \n",transitionCount);
+
+            struct User **sortedUsersToadd = sortUsers(users, userCount);
+            struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
+
+            appendFile(datafile, sortedUsersToadd, userCount);
+            appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
+
+            free(sortedUsers);
+            free(sortedTransitions);
+
+            continue;
+        }
+        if (strcmp(choice, "4") == 0)
+        {
+            system("cls");
+            printf("UserCount : %d \n", userCount);
+            printf("TransitionCount : %d \n", transitionCount);
             printf("The program terminated\n");
 
             // printf("Users\n");
@@ -298,7 +313,7 @@ int main()
             system("cls");
             printf("Invalid choice. Please try again. \n");
         }
-    } while (strcmp(choice, "3") != 0);
+    } while (strcmp(choice, "4") != 0);
 
     return 0;
 }
@@ -945,7 +960,7 @@ void banUser()
     // {
     //     // No user was banned, remove the temporary file
     //     remove("tempfile.txt");
-    // }        
+    // }
 }
 
 void unbanUser()
