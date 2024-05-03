@@ -10,28 +10,33 @@
 #define INITIAL_CREDITS 100
 #define INITIAL_ADMIN_CREDITS 500
 
-struct User
-{
-    char name[50];
-    char password[50];
-    double credits;
-    int isAdmin;
-    int isBan;
-    char phoneNo[20];
-};
+// This won't be necessary for the AVL tree part
 
-struct Transition
-{
-    int id;
-    char sender[50];
-    char receiver[50];
-    double amount;
-    char timestamp[20];
-};
+// // Define the User structure
+// struct User {
+//     char name[50];
+//     char password[50];
+//     double credits;
+//     int isAdmin;
+//     int isBan;
+//     char phoneNo[20];
+// };
+
+// // Define the Transition structure
+// struct Transition {
+//     int id;
+//     char sender[50];
+//     char receiver[50];
+//     double amount;
+//     char timestamp[20];
+// };
 
 char transitionfile[20] = "transition.txt";
 char datafile[20] = "data.txt";
 const char *key = "daKeyxD";
+
+struct User **sortedUsers;
+struct Transition **sortedTransitions;
 
 struct User users[50];
 struct Transition transitions[500];
@@ -45,16 +50,16 @@ void createFile(const char *file_name);
 int isStrongPassword(const char *password);
 int emailChecker(const char *username);
 void shareCredits(struct User *sender, struct User *receiver); // dar pyin ya ml
-void registration(); 
+void registration();
 int login();
 void readFile(const char *file_name);
-void appendFile(const char *file_name, struct User *user); // dar pyin ya ml
-void loadUserData(const char *file_name); 
+void appendFile(const char *file_name, struct User **sortedUsers, int userCount); // dar pyin ya ml
+void loadUserData(const char *file_name);
 void deleteUser(); // dar pyin ya ml
-void banUser(); // dar pyin ya ml
-void unbanUser(); // dar pyin ya ml
+void banUser();    // dar pyin ya ml
+void unbanUser();  // dar pyin ya ml
 int isValidPhoneNumber(const char *phoneNumber);
-void appendTransitionFile(const char *file_name, struct Transition *transition); // dar pyin ya ml
+void appendTransitionFile(const char *file_name, struct Transition **sortedTransitions, int transitionCount); // dar pyin ya ml
 void loadTransitionData(const char *file_name);
 // End of declaration
 
@@ -250,7 +255,41 @@ int main()
         if (strcmp(choice, "3") == 0)
         {
             system("cls");
+            printf("UserCount : %d \n",userCount);
+            printf("TransitionCount : %d \n",transitionCount);
             printf("The program terminated\n");
+
+            // printf("Users\n");
+            // for (int i = 0; i < userCount; i++) {
+            //     printf("%s %s %.2lf\n", users[i].name, users[i].password, users[i].credits);
+            // }
+
+            // printf("Transitions\n");
+            // for (int i = 0; i < transitionCount; i++) {
+            //     printf("%d %s %s %.2lf %s\n", transitions[i].id, transitions[i].sender, transitions[i].receiver, transitions[i].amount, transitions[i].timestamp);
+            // }
+
+            struct User **sortedUsersToadd = sortUsers(users, userCount);
+            struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
+
+            // printf("Sorted Users\n");
+            // for (int i = 0; i < userCount; i++)
+            // {
+            //     printf("%s %s %.2lf\n", sortedUsersToadd[i]->name, sortedUsersToadd[i]->password, sortedUsersToadd[i]->credits);
+            // }
+
+            // printf("\nSorted Transitions\n");
+            // for (int i = 0; i < transitionCount; i++)
+            // {
+            //     printf("%d %s %s %.2lf %s\n", sortedTransitions[i]->id, sortedTransitions[i]->sender, sortedTransitions[i]->receiver, sortedTransitions[i]->amount, sortedTransitions[i]->timestamp);
+            // }
+
+            appendFile(datafile, sortedUsersToadd, userCount);
+            appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
+
+            free(sortedUsers);
+            free(sortedTransitions);
+
             continue;
         }
 
@@ -278,9 +317,9 @@ void createFile(const char *file_name)
     }
 }
 
-void appendFile(const char *file_name, struct User *user)
+void appendFile(const char *file_name, struct User **sortedUsersf, int userCount)
 {
-    FILE *file = fopen(file_name, "a");
+    FILE *file = fopen(file_name, "w");
 
     if (file == NULL)
     {
@@ -288,15 +327,22 @@ void appendFile(const char *file_name, struct User *user)
         return;
     }
 
-    // Format the data and append it to the file
-    fprintf(file, "%s %s %.2lf %d %d %s\n", user->name, user->password, user->credits, user->isAdmin, user->isBan, user->phoneNo);
+    // printf("Sorted Users:\n");
+    // for (int i = 0; i < userCount; i++) {
+    //     printf("%s %s %.2lf %d %d %s\n", sortedUsersf[i]->name, sortedUsersf[i]->password, sortedUsersf[i]->credits, sortedUsersf[i]->isAdmin, sortedUsersf[i]->isBan, sortedUsersf[i]->phoneNo);
+    // }
+
+    for (int i = 0; i < userCount; i++)
+    {
+        fprintf(file, "%s %s %.2lf %d %d %s\n", sortedUsersf[i]->name, sortedUsersf[i]->password, sortedUsersf[i]->credits, sortedUsersf[i]->isAdmin, sortedUsersf[i]->isBan, sortedUsersf[i]->phoneNo);
+    }
 
     fclose(file);
 }
 
-void appendTransitionFile(const char *file_name, struct Transition *transition)
+void appendTransitionFile(const char *file_name, struct Transition **sortedTransitions, int transitionCount)
 {
-    FILE *file = fopen(file_name, "a");
+    FILE *file = fopen(file_name, "w");
 
     if (file == NULL)
     {
@@ -304,7 +350,10 @@ void appendTransitionFile(const char *file_name, struct Transition *transition)
         return;
     }
 
-    fprintf(file, "%d. %s %s %.2lf %s\n", transition->id, transition->sender, transition->receiver, transition->amount, transition->timestamp);
+    for (int i = 0; i < transitionCount; i++)
+    {
+        fprintf(file, "%d. %s %s %.2lf %s\n", sortedTransitions[i]->id, sortedTransitions[i]->sender, sortedTransitions[i]->receiver, sortedTransitions[i]->amount, sortedTransitions[i]->timestamp);
+    }
 
     fclose(file);
 
@@ -403,7 +452,7 @@ void readFile(const char *file_name)
     }
 
     fclose(file);
-} 
+}
 
 int isStrongPassword(const char *password)
 {
@@ -491,43 +540,43 @@ void shareCredits(struct User *sender, struct User *receiver)
         sender->credits -= OwnerBouns;
         users[0].credits += OwnerBouns;
 
-        FILE *file = fopen(datafile, "r");
-        FILE *tempFile = fopen("tempfile.txt", "w");
+        // FILE *file = fopen(datafile, "r");       // The file overwritting method was used before AVL
+        // FILE *tempFile = fopen("tempfile.txt", "w");
 
-        if (file == NULL || tempFile == NULL)
-        {
-            printf("Error opening user data files.\n");
-            return;
-        }
+        // if (file == NULL || tempFile == NULL)
+        // {
+        //     printf("Error opening user data files.\n");
+        //     return;
+        // }
 
-        // Copy records to the temporary file, updating the records for sender and receiver
-        for (int i = 0; i < userCount; i++)
-        {
-            if (strcmp(users[i].name, sender->name) == 0)
-            {
-                fprintf(tempFile, "%s %s %.2lf %d %d %s\n", sender->name, sender->password, sender->credits, sender->isAdmin, sender->isBan, sender->phoneNo);
-            }
-            else if (strcmp(users[i].name, receiver->name) == 0)
-            {
-                fprintf(tempFile, "%s %s %.2lf %d %d %s\n", receiver->name, receiver->password, receiver->credits, receiver->isAdmin, receiver->isBan, receiver->phoneNo);
-            }
-            else
-            {
-                fprintf(tempFile, "%s %s %.2lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
-            }
-        }
+        // Copy records to the temporary file, updating the records for sender and receiver (Not Necessary for AVL)
+        // for (int i = 0; i < userCount; i++)
+        // {
+        //     if (strcmp(users[i].name, sender->name) == 0)
+        //     {
+        //         fprintf(tempFile, "%s %s %.2lf %d %d %s\n", sender->name, sender->password, sender->credits, sender->isAdmin, sender->isBan, sender->phoneNo);
+        //     }
+        //     else if (strcmp(users[i].name, receiver->name) == 0)
+        //     {
+        //         fprintf(tempFile, "%s %s %.2lf %d %d %s\n", receiver->name, receiver->password, receiver->credits, receiver->isAdmin, receiver->isBan, receiver->phoneNo);
+        //     }
+        //     else
+        //     {
+        //         fprintf(tempFile, "%s %s %.2lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
+        //     }
+        // }
 
-        fclose(file);
-        fclose(tempFile);
+        // fclose(file);
+        // fclose(tempFile);
 
-        if (remove(datafile) == 0 && rename("tempfile.txt", datafile) == 0)
-        {
-            printf("User data updated successfully.\n");
-        }
-        else
-        {
-            printf("Error updating user data.\n");
-        }
+        // if (remove(datafile) == 0 && rename("tempfile.txt", datafile) == 0)      This will be unnecessary for the AVL tree part
+        // {
+        //     printf("User data updated successfully.\n");
+        // }
+        // else
+        // {
+        //     printf("Error updating user data.\n");
+        // }
 
         printf("The user data updated successfully");
 
@@ -553,12 +602,14 @@ void shareCredits(struct User *sender, struct User *receiver)
             strcpy(transitions[transitionCount].timestamp, "N/A");
         }
 
-        appendTransitionFile(transitionfile, &transitions[transitionCount]);
+        // appendTransitionFile(transitionfile, &transitions[transitionCount]);     This line need to be updated for the AVL structure
 
         system("cls");
 
         printf("Credits shared successfully!\n");
         printf("The current credits %s (%.2lf credits) and %s (%.2lf credits)\n\n", sender->name, sender->credits, receiver->name, receiver->credits);
+
+        transitionCount++;
     }
     else
     {
@@ -681,9 +732,9 @@ void registration()
                 printf("Current credit of [%s] : %.2lf\n", users[userCount].name, users[userCount].credits);
 
                 // printf("The original password : %s \n", password);
-                // printf("The encrypted password : %s \n", encrypPASS); test cases isn't necessary
+                // printf("The encrypted password : %s \n", encrypPASS);    This test cases isn't necessary
 
-                appendFile(datafile, &users[userCount]);
+                // appendFile(datafile, &users[userCount]);     Old method and needed to update for the AVL structure
                 userCount++;
             }
             else
@@ -787,21 +838,21 @@ void deleteUser()
 
             userCount--;
 
-            // Update the file with the modified user data
-            FILE *file = fopen(datafile, "w");
+            // Update the file with the modified user data (This is the old method before updating with the AVL)
+            // FILE *file = fopen(datafile, "w");
 
-            if (file == NULL)
-            {
-                printf("Error opening file for writing.\n");
-                return;
-            }
+            // if (file == NULL)
+            // {
+            //     printf("Error opening file for writing.\n");
+            //     return;
+            // }
 
-            for (int i = 0; i < userCount; i++)
-            {
-                fprintf(file, "%s %s %.2lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
-            }
+            // for (int i = 0; i < userCount; i++)
+            // {
+            //     fprintf(file, "%s %s %.2lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
+            // }
 
-            fclose(file);
+            // fclose(file);
 
             system("cls");
             printf("User %s is deleted successfully.\n", username);
@@ -829,14 +880,14 @@ void banUser()
     printf("Enter the username to ban : ");
     scanf(" %[^\n]", username);
 
-    FILE *tempFile = fopen("tempfile.txt", "w");
+    // FILE *tempFile = fopen("tempfile.txt", "w");
 
-    if (tempFile == NULL)
-    {
-        system("cls");
-        printf("Error creating temporary file.\n");
-        return;
-    }
+    // if (tempFile == NULL)
+    // {
+    //     system("cls");
+    //     printf("Error creating temporary file.\n");
+    //     return;
+    // }
 
     int userBanned = 0;
     int track_user = 0;
@@ -865,36 +916,36 @@ void banUser()
         }
 
         // Copy other records to the temporary file
-        fprintf(tempFile, "%s %s %lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
+        // fprintf(tempFile, "%s %s %lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);       // Isn't necessay anymore
     }
 
-    if (track_user == 0)
-    {
-        system("cls");
-        printf("User not found\n");
-        remove(datafile);
-        return;
-    }
+    // if (track_user == 0)
+    // {
+    //     system("cls");
+    //     printf("User not found\n");
+    //     remove(datafile);
+    //     return;
+    // }
 
-    fclose(tempFile);
+    // fclose(tempFile);
 
-    if (userBanned)
-    {
-        // Replace the original file with the temporary file only if a user was banned
-        if (remove(datafile) == 0 && rename("tempfile.txt", datafile) == 0)
-        {
-            printf("User data updated successfully.\n");
-        }
-        else
-        {
-            printf("Error updating user data.\n");
-        }
-    }
-    else
-    {
-        // No user was banned, remove the temporary file
-        remove("tempfile.txt");
-    }
+    // if (userBanned)      // Old Method of upadting the User data
+    // {
+    //     // Replace the original file with the temporary file only if a user was banned
+    //     if (remove(datafile) == 0 && rename("tempfile.txt", datafile) == 0)
+    //     {
+    //         printf("User data updated successfully.\n");
+    //     }
+    //     else
+    //     {
+    //         printf("Error updating user data.\n");
+    //     }
+    // }
+    // else
+    // {
+    //     // No user was banned, remove the temporary file
+    //     remove("tempfile.txt");
+    // }        
 }
 
 void unbanUser()
@@ -933,32 +984,32 @@ void unbanUser()
                 printf("The user is not banned yet!\n");
             }
         }
-        fprintf(tempFile, "%s %s %lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);
+        // fprintf(tempFile, "%s %s %lf %d %d %s\n", users[i].name, users[i].password, users[i].credits, users[i].isAdmin, users[i].isBan, users[i].phoneNo);       // Isn't necessay anymore
     }
-    fclose(tempFile);
-    if (search_tracker == 0)
-    {
-        system("cls");
-        printf("User not found!\n");
-        remove("tempfile.txt");
-    }
-    if (userUnbanned)
-    {
-        // Replace the original file with the temporary file only if a user was banned
-        if (remove(datafile) == 0 && rename("tempfile.txt", datafile) == 0)
-        {
-            printf("User data updated successfully.\n");
-        }
-        else
-        {
-            printf("Error updating user data.\n");
-        }
-    }
-    else
-    {
-        // No user was banned, remove the temporary file
-        remove("tempfile.txt");
-    }
+    // fclose(tempFile);
+    // if (search_tracker == 0)
+    // {
+    //     system("cls");
+    //     printf("User not found!\n");
+    //     remove("tempfile.txt");
+    // }
+    // if (userUnbanned)      // Old Method of upadting the User data
+    // {
+    //     // Replace the original file with the temporary file only if a user was banned
+    //     if (remove(datafile) == 0 && rename("tempfile.txt", datafile) == 0)
+    //     {
+    //         printf("User data updated successfully.\n");
+    //     }
+    //     else
+    //     {
+    //         printf("Error updating user data.\n");
+    //     }
+    // }
+    // else
+    // {
+    //     // No user was banned, remove the temporary file
+    //     remove("tempfile.txt");
+    // }
 }
 
 int isNumeric(const char *str)
