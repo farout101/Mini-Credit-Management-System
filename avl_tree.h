@@ -1,27 +1,41 @@
 #ifndef AVL_TREE_H
 #define AVL_TREE_H
 
-// Define UserData structure
-typedef struct {
+struct User {
     char name[50];
     char password[50];
     double credits;
     int isAdmin;
+    int isBan;
     char phoneNo[20];
-} UserData;
+};
 
-// Define AVL tree node structure
-typedef struct AVLNode {
-    UserData* data; // Pointer to user data
-    struct AVLNode* left;
-    struct AVLNode* right;
+struct Transition {
+    int id;
+    char sender[50];
+    char receiver[50];
+    double amount;
+    char timestamp[20];
+};
+
+struct AVLNode {
+    void *data;
+    struct AVLNode *left;
+    struct AVLNode *right;
     int height;
-} AVLNode;
+};
 
-// Function to insert user data into AVL tree
-AVLNode* insertIntoAVL(AVLNode* root, UserData* userData);
-
-// Function to perform in-order traversal of AVL tree and store sorted data in the file
-void traverseAndStoreInOrder(AVLNode* root, FILE* file);
+int height(struct AVLNode *node);
+int max(int a, int b);
+struct AVLNode *newNode(void *data);
+struct AVLNode *rightRotate(struct AVLNode *y);
+struct AVLNode *leftRotate(struct AVLNode *x);
+int getBalance(struct AVLNode *node);
+struct AVLNode *insert(struct AVLNode *node, void *data, int (*compare)(const void *, const void *));
+void inOrderTraversal(struct AVLNode *root, void **sortedArray, int *index);
+int compareUsers(const void *a, const void *b);
+int compareTransitions(const void *a, const void *b);
+struct User **sortUsers(struct User *users, int numUsers);
+struct Transition **sortTransitions(struct Transition *transitions, int numTransitions);
 
 #endif /* AVL_TREE_H */

@@ -1,57 +1,218 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <string.h>
 
-#define KEY_LENGTH 16 // Define the length of the key
+// Define the User structure
+struct User {
+    char name[50];
+    char password[50];
+    double credits;
+    int isAdmin;
+    int isBan;
+    char phoneNo[20];
+};
 
-// Function to generate a random key and store it in a file
-void generateAndStoreKey(const char* filename) {
-    FILE* file = fopen(filename, "wb"); // Open file for writing in binary mode
-    
-    if (file != NULL) {
-        srand(time(NULL)); // Seed the random number generator
-        
-        // Generate random key
-        char key[KEY_LENGTH + 1]; // +1 for null terminator
-        for (int i = 0; i < KEY_LENGTH; ++i) {
-            key[i] = rand() % 128; // Generate random ASCII characters
-        }
-        key[KEY_LENGTH] = '\0'; // Null-terminate the string
-        
-        // Write key to file
-        fwrite(key, sizeof(char), KEY_LENGTH, file);
-        
-        fclose(file); // Close the file
-    } else {
-        printf("Error: Unable to open file for writing.\n");
+// Define the Transition structure
+struct Transition {
+    int id;
+    char sender[50];
+    char receiver[50];
+    double amount;
+    char timestamp[20];
+};
+
+// AVL tree node structure
+struct AVLNode {
+    void *data;
+    struct AVLNode *left;
+    struct AVLNode *right;
+    int height;
+};
+
+// Function to get the height of a node
+int height(struct AVLNode *node) {
+    if (node == NULL)
+        return 0;
+    return node->height;
+}
+
+// Function to get the maximum of two integers
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+// Create a new AVL node
+struct AVLNode *newNode(void *data) {
+    struct AVLNode *node = (struct AVLNode *)malloc(sizeof(struct AVLNode));
+    node->data = data;
+    node->left = NULL;
+    node->right = NULL;
+    node->height = 1;
+    return node;
+}
+
+// Right rotate subtree rooted with y
+struct AVLNode *rightRotate(struct AVLNode *y) {
+    struct AVLNode *x = y->left;
+    struct AVLNode *T2 = x->right;
+
+    // Perform rotation
+    x->right = y;
+    y->left = T2;
+
+    // Update heights
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+
+    // Return new root
+    return x;
+}
+
+// Left rotate subtree rooted with x
+struct AVLNode *leftRotate(struct AVLNode *x) {
+    struct AVLNode *y = x->right;
+    struct AVLNode *T2 = y->left;
+
+    // Perform rotation
+    y->left = x;
+    x->right = T2;
+
+    // Update heights
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+
+    // Return new root
+    return y;
+}
+
+// Get the balance factor of a node
+int getBalance(struct AVLNode *node) {
+    if (node == NULL)
+        return 0;
+    return height(node->left) - height(node->right);
+}
+
+// Insert a new node into the AVL tree
+struct AVLNode *insert(struct AVLNode *node, void *data, int (*compare)(const void *, const void *)) {
+    // Perform standard BST insertion
+    if (node == NULL)
+        return newNode(data);
+
+    if (compare(data, node->data) < 0)
+        node->left = insert(node->left, data, compare);
+    else if (compare(data, node->data) > 0)
+        node->right = insert(node->right, data, compare);
+    else // Equal keys are not allowed in AVL
+        return node;
+
+    // Update height of this ancestor node
+    node->height = 1 + max(height(node->left), height(node->right));
+
+    // Get the balance factor to check whether this node became unbalanced
+    int balance = getBalance(node);
+
+    // If the node is unbalanced, there are 4 cases
+
+    // Left Left Case
+    if (balance > 1 && compare(data, node->left->data) < 0)
+        return rightRotate(node);
+
+    // Right Right Case
+    if (balance < -1 && compare(data, node->right->data) > 0)
+        return leftRotate(node);
+
+    // Left Right Case
+    if (balance > 1 && compare(data, node->left->data) > 0) {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+
+    // Right Left Case
+    if (balance < -1 && compare(data, node->right->data) < 0) {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+
+    // Return the unchanged node pointer
+    return node;
+}
+
+// In-order traversal to fill the array with sorted data
+void inOrderTraversal(struct AVLNode *root, void **sortedArray, int *index) {
+    if (root != NULL) {
+        inOrderTraversal(root->left, sortedArray, index);
+        sortedArray[(*index)++] = root->data;
+        inOrderTraversal(root->right, sortedArray, index);
     }
 }
 
-// Function to read the key from a file
-void readKeyFromFile(const char* filename, char key[]) {
-    FILE* file = fopen(filename, "rb"); // Open file for reading in binary mode
-    
-    if (file != NULL) {
-        // Read key from file
-        fread(key, sizeof(char), KEY_LENGTH, file);
-        
-        fclose(file); // Close the file
-    } else {
-        printf("Error: Unable to open file for reading.\n");
-    }
+// Compare function for Users based on name
+int compareUsers(const void *a, const void *b) {
+    return strcmp(((const struct User *)a)->name, ((const struct User *)b)->name);
+}
+
+// Compare function for Transitions based on timestamp
+int compareTransitions(const void *a, const void *b) {
+    return strcmp(((const struct Transition *)a)->timestamp, ((const struct Transition *)b)->timestamp);
+}
+
+// Sort Users using AVL tree and return sorted array
+struct User **sortUsers(struct User *users, int numUsers) {
+    struct AVLNode *root = NULL;
+    struct User **sortedUsers = malloc(numUsers * sizeof(struct User *));
+    int i, index = 0;
+    for (i = 0; i < numUsers; i++)
+        root = insert(root, &users[i], compareUsers);
+    inOrderTraversal(root, (void **)sortedUsers, &index);
+    return sortedUsers;
+}
+
+// Sort Transitions using AVL tree and return sorted array
+struct Transition **sortTransitions(struct Transition *transitions, int numTransitions) {
+    struct AVLNode *root = NULL;
+    struct Transition **sortedTransitions = malloc(numTransitions * sizeof(struct Transition *));
+    int i, index = 0;
+    for (i = 0; i < numTransitions; i++)
+        root = insert(root, &transitions[i], compareTransitions);
+    inOrderTraversal(root, (void **)sortedTransitions, &index);
+    return sortedTransitions;
 }
 
 int main() {
-    const char* keyFilename = "key.txt"; // File to store the key
-    char key[KEY_LENGTH + 1]; // +1 for null terminator
+    // Sample data
+    struct User users[] = {
+        {"Alice", "password1", 1000.0, 1, 0, "1234567890"},
+        {"Bob", "password2", 500.0, 0, 0, "9876543210"},
+        {"Charlie", "password3", 750.0, 1, 1, "5555555555"}
+    };
+    int numUsers = sizeof(users) / sizeof(users[0]);
 
-    // Generate and store the key
-    generateAndStoreKey(keyFilename);
-    printf("Random key generated and stored in file '%s'.\n", keyFilename);
-    
-    // Read the key from file
-    readKeyFromFile(keyFilename, key);
-    printf("Key read from file: %s\n", key);
+    struct Transition transitions[] = {
+        {1, "Alice", "Bob", 100.0, "2024-04-29 10:00:00"},
+        {2, "Bob", "Charlie", 50.0, "2024-04-29 11:00:00"},
+        {3, "Charlie", "Alice", 75.0, "2024-04-29 12:00:00"}
+    };
+    int numTransitions = sizeof(transitions) / sizeof(transitions[0]);
+
+    // Sort users and transitions using AVL tree
+    struct User **sortedUsers = sortUsers(users, numUsers);
+    struct Transition **sortedTransitions = sortTransitions(transitions, numTransitions);
+
+    // Print sorted users
+    printf("Sorted Users:\n");
+    for (int i = 0; i < numUsers; i++) {
+        printf("%s %s\n", sortedUsers[i]->name, sortedUsers[i]->password);
+    }
+
+    // Print sorted transitions
+    printf("\nSorted Transitions:\n");
+    for (int i = 0; i < numTransitions; i++) {
+        printf("%s\n", sortedTransitions[i]->timestamp);
+    }
+
+    // Free allocated memory
+    free(sortedUsers);
+    free(sortedTransitions);
 
     return 0;
 }
