@@ -11,7 +11,6 @@
               <li><a href="#features">Features</a></li>
               <li><a href="#installation">Installation</a></li>
               <li><a href="#usage">Usage</a></li>
-              <li><a href="#contributing">Contributing</a></li>
               <li><a href="#license">License</a></li>
           </ul>
       </div>
