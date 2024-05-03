@@ -63,6 +63,7 @@ void unbanUser();  // dar pyin ya ml
 int isValidPhoneNumber(const char *phoneNumber);
 void appendTransitionFile(const char *file_name, struct Transition **sortedTransitions, int transitionCount); // dar pyin ya ml
 void loadTransitionData(const char *file_name);
+void savedata();
 // End of declaration
 
 int loggedInUserIndex = -1; // to track the logged-in user's credit
@@ -348,6 +349,8 @@ int main()
             printf("Invalid choice. Please try again. \n");
         }
     } while (strcmp(choice, "4") != 0);
+
+    // atexit(savedata);
 
     return 0;
 }
@@ -1100,4 +1103,21 @@ int isValidPhoneNumber(const char *phoneNumber)
     }
 
     return 1;
+}
+
+void savedata()
+{
+    system("cls");
+    printf("UserCount : %d \n", userCount);
+    printf("TransitionCount : %d \n", transitionCount);
+    printf("The program terminated\n");
+
+    struct User **sortedUsersToadd = sortUsers(users, userCount);
+    struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
+
+    appendFile(datafile, sortedUsersToadd, userCount);
+    appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
+
+    free(sortedUsers);
+    free(sortedTransitions);
 }
