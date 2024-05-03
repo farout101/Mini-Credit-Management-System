@@ -38,4 +38,4 @@ int compareTransitions(const void *a, const void *b);
 struct User **sortUsers(struct User *users, int numUsers);
 struct Transition **sortTransitions(struct Transition *transitions, int numTransitions);
 
-#endif /* AVL_TREE_H */
+#endif

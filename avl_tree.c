@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Define the User structure
 struct User {
     char name[50];
     char password[50];
@@ -12,7 +11,6 @@ struct User {
     char phoneNo[20];
 };
 
-// Define the Transition structure
 struct Transition {
     int id;
     char sender[50];
@@ -21,7 +19,7 @@ struct Transition {
     char timestamp[20];
 };
 
-// AVL tree node structure
+// AVL tree node 
 struct AVLNode {
     void *data;
     struct AVLNode *left;
@@ -29,14 +27,12 @@ struct AVLNode {
     int height;
 };
 
-// Function to get the height of a node
 int height(struct AVLNode *node) {
     if (node == NULL)
         return 0;
     return node->height;
 }
 
-// Function to get the maximum of two integers
 int max(int a, int b) {
     return (a > b) ? a : b;
 }
@@ -110,8 +106,6 @@ struct AVLNode *insert(struct AVLNode *node, void *data, int (*compare)(const vo
 
     // Get the balance factor to check whether this node became unbalanced
     int balance = getBalance(node);
-
-    // If the node is unbalanced, there are 4 cases
 
     // Left Left Case
     if (balance > 1 && compare(data, node->left->data) < 0)
