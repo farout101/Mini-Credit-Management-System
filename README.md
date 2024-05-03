@@ -40,7 +40,9 @@
         </section>
         <section id="license">
             <h2>License</h2>
-            <p>MIT License
+            <p>
+            
+            MIT License
 
             Copyright (c) 2024 Far Out
             
