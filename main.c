@@ -31,6 +31,8 @@
 //     char timestamp[20];
 // };
 
+// start from here
+
 char transitionfile[20] = "transition.txt";
 char datafile[20] = "data.txt";
 const char *key = "daKeyxD";
