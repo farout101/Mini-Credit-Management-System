@@ -1,6 +1,6 @@
 <body>
     <header>
-        <h1>Mini Credit Transaction System</h1>
+        <h1>Mini Credit Management System</h1>
         <p>Made with C</p>
     </header>
     <div class="container">
