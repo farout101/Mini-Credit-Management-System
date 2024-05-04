@@ -13,6 +13,8 @@
 char foldername[20] = "program_data";
 char transitionfile[30] = "program_data/transition.txt";
 char datafile[30] = "program_data/data.txt";
+char keyfile[30] = "program_data/key.txt";
+
 const char *key = "daKeyxD";
 
 struct User **sortedUsers;
@@ -158,16 +160,7 @@ int main()
                         }
                         if (strcmp(option, "5") == 0)
                         {
-                            system("cls");
-
-                            struct User **sortedUsersToadd = sortUsers(users, userCount);
-                            struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
-
-                            appendFile(datafile, sortedUsersToadd, userCount);
-                            appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
-
-                            free(sortedUsers);
-                            free(sortedTransitions);
+                            savedata();
 
                             continue;
                         }
@@ -231,16 +224,7 @@ int main()
 
                         else if (strcasecmp(option, "2") == 0)
                         {
-                            system("cls");
-
-                            struct User **sortedUsersToadd = sortUsers(users, userCount);
-                            struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
-
-                            appendFile(datafile, sortedUsersToadd, userCount);
-                            appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
-
-                            free(sortedUsers);
-                            free(sortedTransitions);
+                            savedata();
 
                             continue;
                         }
@@ -271,16 +255,7 @@ int main()
         }
         if (strcmp(choice, "3") == 0)
         {
-            system("cls");
-
-            struct User **sortedUsersToadd = sortUsers(users, userCount);
-            struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
-
-            appendFile(datafile, sortedUsersToadd, userCount);
-            appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
-
-            free(sortedUsers);
-            free(sortedTransitions);
+            savedata();
 
             continue;
         }
@@ -581,6 +556,8 @@ void shareCredits(struct User *sender, struct User *receiver)
         system("cls");
         printf("Insufficient credits to share.\n");
     }
+
+    savedata();
 }
 
 void registration()
@@ -697,6 +674,8 @@ void registration()
                 printf("Current credit of [%s] : %.2lf\n", users[userCount].name, users[userCount].credits);
 
                 userCount++;
+
+                savedata();
             }
             else
             {
@@ -813,6 +792,8 @@ void deleteUser()
         system("cls");
         printf("User %s doesn't exist\n", username);
     }
+
+    savedata();
 }
 
 void banUser()
@@ -851,6 +832,8 @@ void banUser()
             }
         }
     }
+
+    savedata();
 }
 
 void unbanUser()
@@ -883,6 +866,8 @@ void unbanUser()
             }
         }
     }
+
+    savedata();
 }
 
 int isNumeric(const char *str)
@@ -925,12 +910,9 @@ int isValidPhoneNumber(const char *phoneNumber)
     return 1;
 }
 
-void savedata()
+void savedata() 
 {
     system("cls");
-    printf("UserCount : %d \n", userCount);
-    printf("TransitionCount : %d \n", transitionCount);
-    printf("The program terminated\n");
 
     struct User **sortedUsersToadd = sortUsers(users, userCount);
     struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
