@@ -46,7 +46,7 @@
         <section id="version">
             <h2>Versions</h2>
             <ul>
-                <li>The version 1 and 2 are not that feature rich as the version 3. Provided just as the reference.</li>
+                <li>The version 1 and 2 are not as feature rich as the version 3. Provided just as the reference.</li>
                 <li>The version 3 has more control file system, more appropriate password management, and more Optomized UI.</li>
             </ul>
         </section>
