@@ -41,6 +41,7 @@
                 <li>The admins have the privileges of banning, deleting, and monitoring users.</li>
                 <li>All Users and Admins can simply transfer their credits to one another.</li>
                 <li>The owner of the app will take the 2% of the transaction.</li>
+                <li>Everyone need to have at least 50 credits in their accounts.</li>
             </ul>
         </section>
         <section id="version">
