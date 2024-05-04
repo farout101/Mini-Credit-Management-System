@@ -919,9 +919,6 @@ void savedata()
 
     appendFile(datafile, sortedUsersToadd, userCount);
     appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
-
-    free(sortedUsers);
-    free(sortedTransitions);
 }
 
 void create_folder(const char *folder_name)

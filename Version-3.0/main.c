@@ -11,12 +11,12 @@
 #define INITIAL_ADMIN_CREDITS 500
 
 char foldername[20] = "program_data";
-char transitionfile[30] = "program_data/transition.txt";
+char transactionFile[30] = "program_data/transition.txt";
 char datafile[30] = "program_data/data.txt";
 char keyfile[30] = "program_data/key.txt";
 
 struct User **sortedUsersToadd;
-struct Transition **sortedTransactinsToadd;
+struct Transition **sortedTransactionsfToadd;
 struct Key **sortedKeysToadd;
 
 struct Key keys[50];
@@ -42,8 +42,8 @@ void deleteUser();
 void banUser();
 void unbanUser();
 int isValidPhoneNumber(const char *phoneNumber);
-void appendTransitionFile(const char *file_name, struct Transition **sortedTransactins, int transactionCount);
-void loadTransitionData(const char *file_name);
+void appendtransactionFile(const char *file_name, struct Transition **sortedTransactionsf, int transactionCount);
+void loadTransactionData(const char *file_name);
 void savedata();
 void create_folder(const char *folder_name);
 void appendKeyFile(const char *file_name, struct Key **sortedKeysf, int keyCount);
@@ -60,18 +60,18 @@ int main()
 
     // Load the related files
     loadUserData(datafile);
-    loadTransitionData(transitionfile);
+    loadTransactionData(transactionFile);
     loadKeyFile(keyfile);
     printf("\n");
 
-    if (access(datafile, F_OK) != -1 && access(transitionfile, F_OK) != -1 && access(datafile, F_OK) != -1)
+    if (access(datafile, F_OK) != -1 && access(transactionFile, F_OK) != -1 && access(keyfile, F_OK) != -1)
     {
         printf("The data files are ready...\n");
     }
     else
     {
         createFile(datafile);
-        createFile(transitionfile);
+        createFile(transactionFile);
         createFile(keyfile);
     }
 
@@ -109,8 +109,9 @@ int main()
                     {
                         printf("--Admin Menu--\n\n");
 
-                        printf("Current credit : %.2lf\n", users[loggedInUserIndex].credits);
                         printf("Current user : %s\n", users[loggedInUserIndex].name);
+                        printf("Current credit : %.2lf\n", users[loggedInUserIndex].credits);
+                        printf("Sharable credit : %.2f\n", (users[loggedInUserIndex].credits - users[loggedInUserIndex].credits * 0.02) - 50);
                         printf("\n1. to share\n2. to delete user\n3. to ban user\n4. to unban user\n5. to Refresh Data\n6. to logout\nEnter your choice : ");
                         scanf(" %[^\n]", option);
 
@@ -133,7 +134,7 @@ int main()
                                 }
                             }
 
-                            if (recipientUser != NULL)
+                            if (recipientUser != NULL && strcmp(users[loggedInUserIndex].name, recipientUser->name) != 0)
                             {
                                 shareCredits(&users[loggedInUserIndex], recipientUser);
                                 continue;
@@ -166,10 +167,6 @@ int main()
                         {
                             savedata();
 
-                            free(sortedUsersToadd);
-                            free(sortedTransactinsToadd);
-                            free(sortedKeysToadd);
-
                             system("cls");
 
                             continue;
@@ -195,16 +192,20 @@ int main()
                 {
                     do
                     {
+                        system("cls");
                         printf("--User Menu--\n\n");
 
                         char option[50];
-                        printf("Current credit : %.2lf\n", users[loggedInUserIndex].credits);
                         printf("Current User : %s\n", users[loggedInUserIndex].name);
+                        printf("Current credit : %.2lf\n", users[loggedInUserIndex].credits);
+                        printf("Sharable credit : %.2f\n", (users[loggedInUserIndex].credits - users[loggedInUserIndex].credits * 0.02) - 50);
                         printf("\n1. to share\n2. to Refresh Data\n3. to logout\nEnter your choice : ");
                         scanf(" %[^\n]", option);
 
                         if (strcmp(option, "1") == 0)
                         {
+                            system("cls");
+                            printf("\n--Transaction--\n\n");
                             char recipient[50];
                             printf("Enter the username to share credits with: ");
                             scanf(" %[^\n]", recipient);
@@ -236,10 +237,6 @@ int main()
                         else if (strcasecmp(option, "2") == 0)
                         {
                             savedata();
-
-                            free(sortedUsersToadd);
-                            free(sortedTransactinsToadd);
-                            free(sortedKeysToadd);
 
                             system("cls");
 
@@ -274,10 +271,6 @@ int main()
         {
             savedata();
 
-            free(sortedUsersToadd);
-            free(sortedTransactinsToadd);
-            free(sortedKeysToadd);
-
             system("cls");
 
             continue;
@@ -289,14 +282,10 @@ int main()
             printf("transactionCount : %d \n", transactionCount);
             printf("The program terminated\n");
 
-            struct User **sortedUsersToadd = sortUsers(users, userCount);
-            struct Transition **sortedTransactinsToadd = sortTransitions(transitions, transactionCount);
-
-            appendFile(datafile, sortedUsersToadd, userCount);
-            appendTransitionFile(transitionfile, sortedTransactinsToadd, transactionCount);
+            savedata();
 
             free(sortedUsersToadd);
-            free(sortedTransactinsToadd);
+            free(sortedTransactionsfToadd);
             free(sortedKeysToadd);
 
             continue;
@@ -344,7 +333,7 @@ void appendFile(const char *file_name, struct User **sortedUsersf, int userCount
     fclose(file);
 }
 
-void appendTransitionFile(const char *file_name, struct Transition **sortedTransactins, int transactionCount)
+void appendtransactionFile(const char *file_name, struct Transition **sortedTransactionsf, int transactionCount)
 {
     FILE *file = fopen(file_name, "w");
 
@@ -356,7 +345,7 @@ void appendTransitionFile(const char *file_name, struct Transition **sortedTrans
 
     for (int i = 0; i < transactionCount; i++)
     {
-        fprintf(file, "%d. %s %s %.2lf %s\n", sortedTransactins[i]->id, sortedTransactins[i]->sender, sortedTransactins[i]->receiver, sortedTransactins[i]->amount, sortedTransactins[i]->timestamp);
+        fprintf(file, "%d. %s %s %.2lf %s\n", sortedTransactionsf[i]->id, sortedTransactionsf[i]->sender, sortedTransactionsf[i]->receiver, sortedTransactionsf[i]->amount, sortedTransactionsf[i]->timestamp);
     }
 
     fclose(file);
@@ -412,7 +401,7 @@ void loadKeyFile(const char *file_name)
         }
     }
 
-    printf("%d users loaded.\n", keyCount);
+    printf("%d keys loaded.\n", keyCount);
 
     fclose(file);
 }
@@ -454,7 +443,7 @@ void loadUserData(const char *file_name)
     fclose(file);
 }
 
-void loadTransitionData(const char *file_name)
+void loadTransactionData(const char *file_name)
 {
     transactionCount = 0;
 
@@ -487,6 +476,7 @@ void loadTransitionData(const char *file_name)
     }
 
     printf("%d transitions loaded.\n", transactionCount);
+
     fclose(file);
 }
 
@@ -583,10 +573,11 @@ void shareCredits(struct User *sender, struct User *receiver)
     double creditToShare;
 
     printf("Your current credit : %.2lf\n", sender->credits);
+    printf("Your sharablae credit : %.2lf\n", (sender->credits - sender->credits * 0.02) - 50);
     printf("Enter the amount of credits to share : ");
     scanf("%lf", &creditToShare);
 
-    if (creditToShare <= sender->credits)
+    if (creditToShare <= ((sender->credits - creditToShare * 0.02) - 50))
     {
         double OwnerBouns = creditToShare * 0.02;
 
@@ -613,7 +604,7 @@ void shareCredits(struct User *sender, struct User *receiver)
         if (timeinfo != NULL)
         {
             // Convert the time to a readable format and store it
-            strftime(transitions[transactionCount].timestamp, sizeof(transitions[transactionCount].timestamp), "%Y-%m-%d %H:%M:%S", timeinfo);
+            strftime(transitions[transactionCount].timestamp, sizeof(transitions[transactionCount].timestamp), "%Y-%m-%d_%H:%M:%S", timeinfo);
         }
         else
         {
@@ -622,9 +613,7 @@ void shareCredits(struct User *sender, struct User *receiver)
         }
 
         system("cls");
-
         printf("Credits shared successfully!\n");
-        printf("The current credits %s (%.2lf credits) and %s (%.2lf credits)\n\n", sender->name, sender->credits, receiver->name, receiver->credits);
 
         transactionCount++;
     }
@@ -632,6 +621,7 @@ void shareCredits(struct User *sender, struct User *receiver)
     {
         system("cls");
         printf("Insufficient credits to share.\n");
+        printf("Your maximum credit that can be shared : %lf \n", (sender->credits - creditToShare * 0.02) - 50);
     }
 
     savedata();
@@ -1026,12 +1016,12 @@ int isValidPhoneNumber(const char *phoneNumber)
 
 void savedata()
 {
-    struct User **sortedUsersToadd = sortUsers(users, userCount);
-    struct Transition **sortedTransactinsToadd = sortTransitions(transitions, transactionCount);
-    struct Key **sortedKeysToadd = sortKeys(keys, keyCount);
+    sortedUsersToadd = sortUsers(users, userCount);
+    sortedTransactionsfToadd = sortTransitions(transitions, transactionCount);
+    sortedKeysToadd = sortKeys(keys, keyCount);
 
     appendFile(datafile, sortedUsersToadd, userCount);
-    appendTransitionFile(transitionfile, sortedTransactinsToadd, transactionCount);
+    appendtransactionFile(transactionFile, sortedTransactionsfToadd, transactionCount);
     appendKeyFile(keyfile, sortedKeysToadd, keyCount);
 }
 
