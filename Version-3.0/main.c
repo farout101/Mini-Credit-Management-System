@@ -814,6 +814,7 @@ int login()
     if (keyFound == 0)
     {
         printf("Error finding the key.\n");
+        return 0;
     }
 
     // Authenticate the user
