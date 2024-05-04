@@ -54,6 +54,8 @@ int loggedInUserIndex = -1; // to track the logged-in user's credit
 
 int main()
 {
+    system("cls");
+
     create_folder(foldername);
 
     char choice[50];
@@ -66,7 +68,7 @@ int main()
 
     if (access(datafile, F_OK) != -1 && access(transactionFile, F_OK) != -1 && access(keyfile, F_OK) != -1)
     {
-        printf("The data files are ready...\n");
+        printf("The data files are ready...\n\n");
     }
     else
     {
@@ -77,7 +79,7 @@ int main()
 
     do
     {
-        printf("\n---Welcome to Credit Management System---\n");
+        printf("---Welcome to Credit Management System---\n");
 
         printf("\n1. to Login\n2. to Register\n3. to Refresh Data\n4. to Exit");
         printf("\nEnter your choice : ");
@@ -1030,7 +1032,7 @@ void create_folder(const char *folder_name)
     // Check if the folder already exists
     if (access(folder_name, F_OK) != -1)
     {
-        printf("\nThe folder (%s) is ready...\n\n", folder_name);
+        printf("The folder (%s) is ready...\n\n", folder_name);
     }
     else
     {
@@ -1041,7 +1043,7 @@ void create_folder(const char *folder_name)
         }
         else
         {
-            printf("\nThe folder %s is successfully created...\n\n", folder_name);
+            printf("The folder %s is successfully created...\n\n", folder_name);
         }
     }
 }
