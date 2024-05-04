@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/phyoz/OneDrive/Desktop/New Bla Bla/National Cyber City/C Folder",
-      "program": "c:/Users/phyoz/OneDrive/Desktop/New Bla Bla/National Cyber City/C Folder/build/Debug/outDebug",
+      "cwd": ".",
+      "program": "build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

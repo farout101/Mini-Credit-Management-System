@@ -16,14 +16,8 @@ char datafile[30] = "program_data/data.txt";
 char keyfile[30] = "program_data/key.txt";
 
 struct User **sortedUsersToadd;
-struct Transition **sortedTransitionsToadd;
+struct Transition **sortedTransactinsToadd;
 struct Key **sortedKeysToadd;
-
-// const char *key = "daKeyxD";
-
-// struct User **sortedUsers;
-// struct Transition **sortedTransitions;
-// struct Key **sortedKeys;
 
 struct Key keys[50];
 struct User users[50];
@@ -31,7 +25,7 @@ struct Transition transitions[500];
 
 int keyCount = 0;
 int userCount = 0;
-int transitionCount = 0;
+int transactionCount = 0;
 
 // Function declaration
 int isNumeric(const char *str);
@@ -48,7 +42,7 @@ void deleteUser();
 void banUser();
 void unbanUser();
 int isValidPhoneNumber(const char *phoneNumber);
-void appendTransitionFile(const char *file_name, struct Transition **sortedTransitions, int transitionCount);
+void appendTransitionFile(const char *file_name, struct Transition **sortedTransactins, int transactionCount);
 void loadTransitionData(const char *file_name);
 void savedata();
 void create_folder(const char *folder_name);
@@ -172,9 +166,11 @@ int main()
                         {
                             savedata();
 
-                            // free(sortedUsersToadd);
-                            // free(sortedTransitionsToadd);
-                            // free(sortedKeysToadd);
+                            free(sortedUsersToadd);
+                            free(sortedTransactinsToadd);
+                            free(sortedKeysToadd);
+
+                            system("cls");
 
                             continue;
                         }
@@ -241,9 +237,11 @@ int main()
                         {
                             savedata();
 
-                            // free(sortedUsersToadd);
-                            // free(sortedTransitionsToadd);
-                            // free(sortedKeysToadd);
+                            free(sortedUsersToadd);
+                            free(sortedTransactinsToadd);
+                            free(sortedKeysToadd);
+
+                            system("cls");
 
                             continue;
                         }
@@ -276,9 +274,11 @@ int main()
         {
             savedata();
 
-            // free(sortedUsersToadd);
-            // free(sortedTransitionsToadd);
-            // free(sortedKeysToadd);
+            free(sortedUsersToadd);
+            free(sortedTransactinsToadd);
+            free(sortedKeysToadd);
+
+            system("cls");
 
             continue;
         }
@@ -286,17 +286,18 @@ int main()
         {
             system("cls");
             printf("UserCount : %d \n", userCount);
-            printf("TransitionCount : %d \n", transitionCount);
+            printf("transactionCount : %d \n", transactionCount);
             printf("The program terminated\n");
 
             struct User **sortedUsersToadd = sortUsers(users, userCount);
-            struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
+            struct Transition **sortedTransactinsToadd = sortTransitions(transitions, transactionCount);
 
             appendFile(datafile, sortedUsersToadd, userCount);
-            appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
+            appendTransitionFile(transitionfile, sortedTransactinsToadd, transactionCount);
 
-            // free(sortedUsers);
-            // free(sortedTransitions);
+            free(sortedUsersToadd);
+            free(sortedTransactinsToadd);
+            free(sortedKeysToadd);
 
             continue;
         }
@@ -343,7 +344,7 @@ void appendFile(const char *file_name, struct User **sortedUsersf, int userCount
     fclose(file);
 }
 
-void appendTransitionFile(const char *file_name, struct Transition **sortedTransitions, int transitionCount)
+void appendTransitionFile(const char *file_name, struct Transition **sortedTransactins, int transactionCount)
 {
     FILE *file = fopen(file_name, "w");
 
@@ -353,14 +354,12 @@ void appendTransitionFile(const char *file_name, struct Transition **sortedTrans
         return;
     }
 
-    for (int i = 0; i < transitionCount; i++)
+    for (int i = 0; i < transactionCount; i++)
     {
-        fprintf(file, "%d. %s %s %.2lf %s\n", sortedTransitions[i]->id, sortedTransitions[i]->sender, sortedTransitions[i]->receiver, sortedTransitions[i]->amount, sortedTransitions[i]->timestamp);
+        fprintf(file, "%d. %s %s %.2lf %s\n", sortedTransactins[i]->id, sortedTransactins[i]->sender, sortedTransactins[i]->receiver, sortedTransactins[i]->amount, sortedTransactins[i]->timestamp);
     }
 
     fclose(file);
-
-    transitionCount++;
 }
 
 void appendKeyFile(const char *file_name, struct Key **sortedKeysf, int keyCount)
@@ -375,7 +374,7 @@ void appendKeyFile(const char *file_name, struct Key **sortedKeysf, int keyCount
 
     for (int i = 0; i < keyCount; i++)
     {
-        fprintf(file, "%s %s %s\n", sortedKeysf[keyCount]->name, sortedKeysf[keyCount]->phoneNo, sortedKeysf[keyCount]->key);
+        fprintf(file, "%s %s %s\n", sortedKeysf[i]->name, sortedKeysf[i]->phoneNo, sortedKeysf[i]->key);
     }
 
     fclose(file);
@@ -389,7 +388,7 @@ void loadKeyFile(const char *file_name)
 
     if (file == NULL)
     {
-        printf("Error opening (%s) for reading...\n",file_name);
+        printf("Error opening (%s) for reading...\n", file_name);
         return;
     }
 
@@ -426,7 +425,7 @@ void loadUserData(const char *file_name)
 
     if (file == NULL)
     {
-        printf("Error opening (%s) for reading...\n",file_name);
+        printf("Error opening (%s) for reading...\n", file_name);
         return;
     }
 
@@ -457,13 +456,13 @@ void loadUserData(const char *file_name)
 
 void loadTransitionData(const char *file_name)
 {
-    transitionCount = 0;
+    transactionCount = 0;
 
     FILE *file = fopen(file_name, "r");
 
     if (file == NULL)
     {
-        printf("Error opening (%s) file for reading...\n",file_name);
+        printf("Error opening (%s) file for reading...\n", file_name);
         return;
     }
 
@@ -472,22 +471,22 @@ void loadTransitionData(const char *file_name)
     while (fgets(buffer, sizeof(buffer), file) != NULL)
     {
         // Handle user registration record
-        if (sscanf(buffer, "%d. %s %s %lf %s", &transitions[transitionCount].id, transitions[transitionCount].sender, transitions[transitionCount].receiver, &transitions[transitionCount].amount, transitions[transitionCount].timestamp) != 5)
+        if (sscanf(buffer, "%d. %s %s %lf %s", &transitions[transactionCount].id, transitions[transactionCount].sender, transitions[transactionCount].receiver, &transitions[transactionCount].amount, transitions[transactionCount].timestamp) != 5)
         {
             printf("Error reading transition record.\n");
             break;
         }
 
-        transitionCount++;
+        transactionCount++;
 
-        if (transitionCount >= sizeof(transitions) / sizeof(transitions[0]))
+        if (transactionCount >= sizeof(transitions) / sizeof(transitions[0]))
         {
             printf("Warning: Maximum transition record limit reached.\n");
             break;
         }
     }
 
-    printf("%d transitions loaded.\n", transitionCount);
+    printf("%d transitions loaded.\n", transactionCount);
     fclose(file);
 }
 
@@ -600,10 +599,10 @@ void shareCredits(struct User *sender, struct User *receiver)
 
         printf("The user data updated successfully");
 
-        transitions[transitionCount].id = transitionCount + 1;
-        strcpy(transitions[transitionCount].sender, sender->name);
-        strcpy(transitions[transitionCount].receiver, receiver->name);
-        transitions[transitionCount].amount = creditToShare;
+        transitions[transactionCount].id = transactionCount + 1;
+        strcpy(transitions[transactionCount].sender, sender->name);
+        strcpy(transitions[transactionCount].receiver, receiver->name);
+        transitions[transactionCount].amount = creditToShare;
 
         time_t rawtime;
         struct tm *timeinfo;
@@ -614,12 +613,12 @@ void shareCredits(struct User *sender, struct User *receiver)
         if (timeinfo != NULL)
         {
             // Convert the time to a readable format and store it
-            strftime(transitions[transitionCount].timestamp, sizeof(transitions[transitionCount].timestamp), "%Y-%m-%d %H:%M:%S", timeinfo);
+            strftime(transitions[transactionCount].timestamp, sizeof(transitions[transactionCount].timestamp), "%Y-%m-%d %H:%M:%S", timeinfo);
         }
         else
         {
             // Indicate that the timestamp is not available
-            strcpy(transitions[transitionCount].timestamp, "N/A");
+            strcpy(transitions[transactionCount].timestamp, "N/A");
         }
 
         system("cls");
@@ -627,7 +626,7 @@ void shareCredits(struct User *sender, struct User *receiver)
         printf("Credits shared successfully!\n");
         printf("The current credits %s (%.2lf credits) and %s (%.2lf credits)\n\n", sender->name, sender->credits, receiver->name, receiver->credits);
 
-        transitionCount++;
+        transactionCount++;
     }
     else
     {
@@ -756,11 +755,9 @@ void registration()
                     printf("Successfully Registered!!!\n");
                 }
 
-                printf("Current credit of [%s] : %.2lf\n", users[userCount].name, users[userCount].credits);
+                printf("Current credit of [%s] : %.2lf\n\n", users[userCount].name, users[userCount].credits);
 
-                printf("The Key name : %s \n", keys[keyCount].name);
-                printf("The Key phoneNo : %s \n", keys[keyCount].phoneNo);
-                printf("The Key key : %s \n", keys[keyCount].key);
+                printf("< Your Security Key : %s >\n", keys[keyCount].key);
 
                 userCount++;
                 keyCount++;
@@ -783,6 +780,8 @@ void registration()
 
 int login()
 {
+    int keyFound = 0;
+
     system("cls");
 
     printf("---Login---\n\n");
@@ -816,11 +815,13 @@ int login()
         if (strcmp(keys[i].name, username) == 0)
         {
             strcpy(key, keys[i].key);
+            keyFound = 1;
         }
-        else
-        {
-            printf("Error finding the key.\n");
-        }
+    }
+
+    if (keyFound == 0)
+    {
+        printf("Error finding the key.\n");
     }
 
     // Authenticate the user
@@ -1026,11 +1027,11 @@ int isValidPhoneNumber(const char *phoneNumber)
 void savedata()
 {
     struct User **sortedUsersToadd = sortUsers(users, userCount);
-    struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
+    struct Transition **sortedTransactinsToadd = sortTransitions(transitions, transactionCount);
     struct Key **sortedKeysToadd = sortKeys(keys, keyCount);
 
     appendFile(datafile, sortedUsersToadd, userCount);
-    appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
+    appendTransitionFile(transitionfile, sortedTransactinsToadd, transactionCount);
     appendKeyFile(keyfile, sortedKeysToadd, keyCount);
 }
 

@@ -3,14 +3,16 @@
 #include <stdlib.h>
 #include <time.h>
 
-void generateRandomKey(char key[], size_t keyLen) {
+void generateRandomKey(char key[], size_t keyLen)
+{
     srand(time(NULL)); // Seed the random number generator with the current time
 
     // Define the valid characters for the key
     const char valid_characters[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     size_t num_valid_characters = strlen(valid_characters);
 
-    for (size_t i = 0; i < keyLen; ++i) {
+    for (size_t i = 0; i < keyLen; ++i)
+    {
         // Generate a random index to select a character from the valid_characters array
         size_t index = rand() % num_valid_characters;
         // Assign the selected character to the key
@@ -20,8 +22,6 @@ void generateRandomKey(char key[], size_t keyLen) {
     key[keyLen] = '\0'; // Null-terminate the string
 }
 
-
-
 void encryptPassword(const char password[], const char key[], char encryptedPassword[])
 {
     size_t len = strlen(password);
@@ -30,7 +30,15 @@ void encryptPassword(const char password[], const char key[], char encryptedPass
 
     for (size_t i = 0; i < len; ++i)
     {
-        char encryptedChar = password[i] ^ key[i % keyLen]; // Perform XOR operation
+        char encryptedChar;
+
+        // Skip space characters in the password
+        if (password[i] == ' ')
+        {
+            continue; // Skip further processing for space characters
+        }
+
+        encryptedChar = password[i] ^ key[i % keyLen]; // Perform XOR operation
 
         // Used to keep the char range between 32 and 126
         while (encryptedChar < 32 || encryptedChar > 126)
