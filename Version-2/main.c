@@ -10,8 +10,9 @@
 #define INITIAL_CREDITS 100
 #define INITIAL_ADMIN_CREDITS 500
 
-char transitionfile[20] = "transition.txt";
-char datafile[20] = "data.txt";
+char foldername[20] = "program_data";
+char transitionfile[30] = "program_data/transition.txt";
+char datafile[30] = "program_data/data.txt";
 const char *key = "daKeyxD";
 
 struct User **sortedUsers;
@@ -28,25 +29,29 @@ int isNumeric(const char *str);
 void createFile(const char *file_name);
 int isStrongPassword(const char *password);
 int emailChecker(const char *username);
-void shareCredits(struct User *sender, struct User *receiver); 
+void shareCredits(struct User *sender, struct User *receiver);
 void registration();
 int login();
 void readFile(const char *file_name);
-void appendFile(const char *file_name, struct User **sortedUsers, int userCount); 
+void appendFile(const char *file_name, struct User **sortedUsers, int userCount);
 void loadUserData(const char *file_name);
 void deleteUser();
-void banUser();   
-void unbanUser(); 
+void banUser();
+void unbanUser();
 int isValidPhoneNumber(const char *phoneNumber);
 void appendTransitionFile(const char *file_name, struct Transition **sortedTransitions, int transitionCount);
 void loadTransitionData(const char *file_name);
 void savedata();
+void create_folder(const char *folder_name);
 // End of declaration
 
 int loggedInUserIndex = -1; // to track the logged-in user's credit
 
 int main()
 {
+
+    create_folder(foldername);
+
     char choice[50];
 
     // Load user data from the file
@@ -935,4 +940,25 @@ void savedata()
 
     free(sortedUsers);
     free(sortedTransitions);
+}
+
+void create_folder(const char *folder_name)
+{
+    // Check if the folder already exists
+    if (access(folder_name, F_OK) != -1)
+    {
+        printf("The folder (%s) is ready...\n", folder_name);
+    }
+    else
+    {
+        // Create the folder if it does not exist
+        if (mkdir(folder_name) == -1)
+        {
+            perror("Error creating folder!");
+        }
+        else
+        {
+            printf("The folder %s is successfully created...\n", folder_name);
+        }
+    }
 }
