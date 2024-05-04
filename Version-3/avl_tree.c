@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct User {
+struct User
+{
     char name[50];
     char password[50];
     double credits;
@@ -11,7 +12,8 @@ struct User {
     char phoneNo[20];
 };
 
-struct Transition {
+struct Transition
+{
     int id;
     char sender[50];
     char receiver[50];
@@ -19,26 +21,37 @@ struct Transition {
     char timestamp[20];
 };
 
-// AVL tree node 
-struct AVLNode {
+struct Key
+{
+    char name[50];
+    char phoneNo[20];
+    char key[50];
+};
+
+// AVL tree node
+struct AVLNode
+{
     void *data;
     struct AVLNode *left;
     struct AVLNode *right;
     int height;
 };
 
-int height(struct AVLNode *node) {
+int height(struct AVLNode *node)
+{
     if (node == NULL)
         return 0;
     return node->height;
 }
 
-int max(int a, int b) {
+int max(int a, int b)
+{
     return (a > b) ? a : b;
 }
 
 // Create a new AVL node
-struct AVLNode *newNode(void *data) {
+struct AVLNode *newNode(void *data)
+{
     struct AVLNode *node = (struct AVLNode *)malloc(sizeof(struct AVLNode));
     node->data = data;
     node->left = NULL;
@@ -48,7 +61,8 @@ struct AVLNode *newNode(void *data) {
 }
 
 // Right rotate subtree rooted with y
-struct AVLNode *rightRotate(struct AVLNode *y) {
+struct AVLNode *rightRotate(struct AVLNode *y)
+{
     struct AVLNode *x = y->left;
     struct AVLNode *T2 = x->right;
 
@@ -65,7 +79,8 @@ struct AVLNode *rightRotate(struct AVLNode *y) {
 }
 
 // Left rotate subtree rooted with x
-struct AVLNode *leftRotate(struct AVLNode *x) {
+struct AVLNode *leftRotate(struct AVLNode *x)
+{
     struct AVLNode *y = x->right;
     struct AVLNode *T2 = y->left;
 
@@ -82,14 +97,16 @@ struct AVLNode *leftRotate(struct AVLNode *x) {
 }
 
 // Get the balance factor of a node
-int getBalance(struct AVLNode *node) {
+int getBalance(struct AVLNode *node)
+{
     if (node == NULL)
         return 0;
     return height(node->left) - height(node->right);
 }
 
 // Insert a new node into the AVL tree
-struct AVLNode *insert(struct AVLNode *node, void *data, int (*compare)(const void *, const void *)) {
+struct AVLNode *insert(struct AVLNode *node, void *data, int (*compare)(const void *, const void *))
+{
     // Perform standard BST insertion
     if (node == NULL)
         return newNode(data);
@@ -116,13 +133,15 @@ struct AVLNode *insert(struct AVLNode *node, void *data, int (*compare)(const vo
         return leftRotate(node);
 
     // Left Right Case
-    if (balance > 1 && compare(data, node->left->data) > 0) {
+    if (balance > 1 && compare(data, node->left->data) > 0)
+    {
         node->left = leftRotate(node->left);
         return rightRotate(node);
     }
 
     // Right Left Case
-    if (balance < -1 && compare(data, node->right->data) < 0) {
+    if (balance < -1 && compare(data, node->right->data) < 0)
+    {
         node->right = rightRotate(node->right);
         return leftRotate(node);
     }
@@ -132,8 +151,10 @@ struct AVLNode *insert(struct AVLNode *node, void *data, int (*compare)(const vo
 }
 
 // In-order traversal to fill the array with sorted data
-void inOrderTraversal(struct AVLNode *root, void **sortedArray, int *index) {
-    if (root != NULL) {
+void inOrderTraversal(struct AVLNode *root, void **sortedArray, int *index)
+{
+    if (root != NULL)
+    {
         inOrderTraversal(root->left, sortedArray, index);
         sortedArray[(*index)++] = root->data;
         inOrderTraversal(root->right, sortedArray, index);
@@ -141,16 +162,24 @@ void inOrderTraversal(struct AVLNode *root, void **sortedArray, int *index) {
 }
 
 // Compare function for Users based on name
-int compareUsers(const void *a, const void *b) {
+int compareUsers(const void *a, const void *b)
+{
     return strcmp(((const struct User *)a)->name, ((const struct User *)b)->name);
 }
 
 // Compare function for Transitions based on timestamp
-int compareTransitions(const void *a, const void *b) {
+int compareTransitions(const void *a, const void *b)
+{
     return strcmp(((const struct Transition *)a)->timestamp, ((const struct Transition *)b)->timestamp);
 }
 
-struct User **sortUsers(struct User *users, int numUsers) {
+int compareKeys(const void *a, const void *b)
+{
+    return strcmp(((const struct Key *)a)->name, ((const struct Key *)b)->name);
+}
+
+struct User **sortUsers(struct User *users, int numUsers)
+{
     struct AVLNode *root = NULL;
     struct User **sortedUsers = malloc(numUsers * sizeof(struct User *));
     int i, index = 0;
@@ -160,7 +189,8 @@ struct User **sortUsers(struct User *users, int numUsers) {
     return sortedUsers;
 }
 
-struct Transition **sortTransitions(struct Transition *transitions, int numTransitions) {
+struct Transition **sortTransitions(struct Transition *transitions, int numTransitions)
+{
     struct AVLNode *root = NULL;
     struct Transition **sortedTransitions = malloc(numTransitions * sizeof(struct Transition *));
     int i, index = 0;
@@ -168,4 +198,16 @@ struct Transition **sortTransitions(struct Transition *transitions, int numTrans
         root = insert(root, &transitions[i], compareTransitions);
     inOrderTraversal(root, (void **)sortedTransitions, &index);
     return sortedTransitions;
+}
+
+struct Key **sortKeys(struct Key *keys, int numKeys)
+{
+    struct AVLNode *root = NULL;
+    struct Key **sortedKeys = malloc(numKeys * sizeof(struct Key *));
+    int i, index = 0;
+    for (i = 0; i < numKeys; i++)
+        root = insert(root, &keys[i], compareKeys);
+
+    inOrderTraversal(root, (void **)sortedKeys, &index);
+    return sortedKeys;
 }

@@ -1,7 +1,8 @@
 #ifndef AVL_TREE_H
 #define AVL_TREE_H
 
-struct User {
+struct User
+{
     char name[50];
     char password[50];
     double credits;
@@ -10,7 +11,8 @@ struct User {
     char phoneNo[20];
 };
 
-struct Transition {
+struct Transition
+{
     int id;
     char sender[50];
     char receiver[50];
@@ -18,7 +20,15 @@ struct Transition {
     char timestamp[20];
 };
 
-struct AVLNode {
+struct Key
+{
+    char name[50];
+    char phoneNo[20];
+    char key[50];
+};
+
+struct AVLNode
+{
     void *data;
     struct AVLNode *left;
     struct AVLNode *right;
@@ -37,5 +47,6 @@ int compareUsers(const void *a, const void *b);
 int compareTransitions(const void *a, const void *b);
 struct User **sortUsers(struct User *users, int numUsers);
 struct Transition **sortTransitions(struct Transition *transitions, int numTransitions);
+struct Key **sortKeys(struct Key *keys, int numKeys);
 
 #endif

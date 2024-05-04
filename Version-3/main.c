@@ -15,14 +15,21 @@ char transitionfile[30] = "program_data/transition.txt";
 char datafile[30] = "program_data/data.txt";
 char keyfile[30] = "program_data/key.txt";
 
-const char *key = "daKeyxD";
+struct User **sortedUsersToadd;
+struct Transition **sortedTransitionsToadd;
+struct Key **sortedKeysToadd;
 
-struct User **sortedUsers;
-struct Transition **sortedTransitions;
+// const char *key = "daKeyxD";
 
+// struct User **sortedUsers;
+// struct Transition **sortedTransitions;
+// struct Key **sortedKeys;
+
+struct Key keys[50];
 struct User users[50];
 struct Transition transitions[500];
 
+int keyCount = 0;
 int userCount = 0;
 int transitionCount = 0;
 
@@ -35,7 +42,7 @@ void shareCredits(struct User *sender, struct User *receiver);
 void registration();
 int login();
 void readFile(const char *file_name);
-void appendFile(const char *file_name, struct User **sortedUsers, int userCount);
+void appendFile(const char *file_name, struct User **sortedUsers, int keyCount);
 void loadUserData(const char *file_name);
 void deleteUser();
 void banUser();
@@ -45,24 +52,25 @@ void appendTransitionFile(const char *file_name, struct Transition **sortedTrans
 void loadTransitionData(const char *file_name);
 void savedata();
 void create_folder(const char *folder_name);
+void appendKeyFile(const char *file_name, struct Key **sortedKeysf, int keyCount);
+void loadKeyFile(const char *file_name);
 // End of declaration
 
 int loggedInUserIndex = -1; // to track the logged-in user's credit
 
 int main()
 {
-
     create_folder(foldername);
 
     char choice[50];
 
-    // Load user data from the file
+    // Load the related files
     loadUserData(datafile);
-
-    // Load transition data from the file
     loadTransitionData(transitionfile);
+    loadKeyFile(keyfile);
+    printf("\n");
 
-    if (access(datafile, F_OK) != -1 && access(transitionfile, F_OK) != -1)
+    if (access(datafile, F_OK) != -1 && access(transitionfile, F_OK) != -1 && access(datafile, F_OK) != -1)
     {
         printf("The data files are ready...\n");
     }
@@ -70,6 +78,7 @@ int main()
     {
         createFile(datafile);
         createFile(transitionfile);
+        createFile(keyfile);
     }
 
     do
@@ -107,6 +116,7 @@ int main()
                         printf("--Admin Menu--\n\n");
 
                         printf("Current credit : %.2lf\n", users[loggedInUserIndex].credits);
+                        printf("Current user : %s\n", users[loggedInUserIndex].name);
                         printf("\n1. to share\n2. to delete user\n3. to ban user\n4. to unban user\n5. to Refresh Data\n6. to logout\nEnter your choice : ");
                         scanf(" %[^\n]", option);
 
@@ -162,6 +172,10 @@ int main()
                         {
                             savedata();
 
+                            // free(sortedUsersToadd);
+                            // free(sortedTransitionsToadd);
+                            // free(sortedKeysToadd);
+
                             continue;
                         }
                         if (strcmp(option, "6") == 0)
@@ -189,6 +203,7 @@ int main()
 
                         char option[50];
                         printf("Current credit : %.2lf\n", users[loggedInUserIndex].credits);
+                        printf("Current User : %s\n", users[loggedInUserIndex].name);
                         printf("\n1. to share\n2. to Refresh Data\n3. to logout\nEnter your choice : ");
                         scanf(" %[^\n]", option);
 
@@ -226,6 +241,10 @@ int main()
                         {
                             savedata();
 
+                            // free(sortedUsersToadd);
+                            // free(sortedTransitionsToadd);
+                            // free(sortedKeysToadd);
+
                             continue;
                         }
                         else if (strcmp(option, "3") == 0)
@@ -257,6 +276,10 @@ int main()
         {
             savedata();
 
+            // free(sortedUsersToadd);
+            // free(sortedTransitionsToadd);
+            // free(sortedKeysToadd);
+
             continue;
         }
         if (strcmp(choice, "4") == 0)
@@ -272,8 +295,8 @@ int main()
             appendFile(datafile, sortedUsersToadd, userCount);
             appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
 
-            free(sortedUsers);
-            free(sortedTransitions);
+            // free(sortedUsers);
+            // free(sortedTransitions);
 
             continue;
         }
@@ -340,6 +363,61 @@ void appendTransitionFile(const char *file_name, struct Transition **sortedTrans
     transitionCount++;
 }
 
+void appendKeyFile(const char *file_name, struct Key **sortedKeysf, int keyCount)
+{
+    FILE *file = fopen(file_name, "w");
+
+    if (file == NULL)
+    {
+        printf("Error opening file: %s\n", file_name);
+        return;
+    }
+
+    for (int i = 0; i < keyCount; i++)
+    {
+        fprintf(file, "%s %s %s\n", sortedKeysf[keyCount]->name, sortedKeysf[keyCount]->phoneNo, sortedKeysf[keyCount]->key);
+    }
+
+    fclose(file);
+}
+
+void loadKeyFile(const char *file_name)
+{
+    keyCount = 0;
+
+    FILE *file = fopen(file_name, "r");
+
+    if (file == NULL)
+    {
+        printf("Error opening (%s) for reading...\n",file_name);
+        return;
+    }
+
+    char buffer[256];
+
+    while (fgets(buffer, sizeof(buffer), file) != NULL)
+    {
+        // Handle user registration record
+        if (sscanf(buffer, "%s %s %s\n", keys[keyCount].name, keys[keyCount].phoneNo, keys[keyCount].key) != 3)
+        {
+            printf("Error reading user registration record.\n");
+            break;
+        }
+
+        keyCount++;
+
+        if (keyCount >= sizeof(keys) / sizeof(keys[0]))
+        {
+            printf("Warning: Maximum user limit reached.\n");
+            break;
+        }
+    }
+
+    printf("%d users loaded.\n", keyCount);
+
+    fclose(file);
+}
+
 void loadUserData(const char *file_name)
 {
     userCount = 0;
@@ -348,7 +426,7 @@ void loadUserData(const char *file_name)
 
     if (file == NULL)
     {
-        perror("Error opening file for reading");
+        printf("Error opening (%s) for reading...\n",file_name);
         return;
     }
 
@@ -385,7 +463,7 @@ void loadTransitionData(const char *file_name)
 
     if (file == NULL)
     {
-        perror("Error opening transition file for reading");
+        printf("Error opening (%s) file for reading...\n",file_name);
         return;
     }
 
@@ -613,8 +691,11 @@ void registration()
             }
 
             strcpy(users[userCount].phoneNo, phoneNo);
+            strcpy(keys[keyCount].phoneNo, phoneNo);
 
             strcpy(users[userCount].name, username);
+            strcpy(keys[keyCount].name, username);
+
             printf("Enter password (no space is allowed): ");
             scanf(" %[^\n]", password);
 
@@ -632,9 +713,13 @@ void registration()
             {
                 password[strcspn(password, "\n")] = '\0';
 
-                char encrypPASS[20];
+                char encrypPASS[strlen(password) + 1];
+                char key[strlen(password) + 1];
 
+                generateRandomKey(key, strlen(password));
                 encryptPassword(password, key, encrypPASS);
+
+                strcpy(keys[keyCount].key, key);
 
                 strcpy(users[userCount].password, encrypPASS);
 
@@ -673,7 +758,12 @@ void registration()
 
                 printf("Current credit of [%s] : %.2lf\n", users[userCount].name, users[userCount].credits);
 
+                printf("The Key name : %s \n", keys[keyCount].name);
+                printf("The Key phoneNo : %s \n", keys[keyCount].phoneNo);
+                printf("The Key key : %s \n", keys[keyCount].key);
+
                 userCount++;
+                keyCount++;
 
                 savedata();
             }
@@ -699,6 +789,7 @@ int login()
 
     char username[50];
     char password[50];
+    char key[50];
 
     printf("Enter your e-mail : ");
     scanf(" %[^\n]", username);
@@ -717,7 +808,20 @@ int login()
     printf("Enter password : ");
     scanf(" %[^\n]", password);
 
-    char decrypPass[50];
+    char decrypPass[strlen(password) + 1];
+
+    // Finding The key
+    for (int i = 0; i < keyCount; i++)
+    {
+        if (strcmp(keys[i].name, username) == 0)
+        {
+            strcpy(key, keys[i].key);
+        }
+        else
+        {
+            printf("Error finding the key.\n");
+        }
+    }
 
     // Authenticate the user
     for (int i = 0; i < userCount; i++)
@@ -778,8 +882,19 @@ void deleteUser()
 
             userCount--;
 
+            for (int i = userIndex; i < keyCount - 1; i++)
+            {
+                strcpy(keys[i].name, keys[i + 1].name);
+                strcpy(keys[i].phoneNo, keys[i + 1].phoneNo);
+                strcpy(keys[i].key, keys[i + 1].key);
+            }
+
+            keyCount--;
+
             system("cls");
             printf("User %s is deleted successfully.\n", username);
+
+            savedata();
         }
         else
         {
@@ -792,8 +907,6 @@ void deleteUser()
         system("cls");
         printf("User %s doesn't exist\n", username);
     }
-
-    savedata();
 }
 
 void banUser()
@@ -910,18 +1023,15 @@ int isValidPhoneNumber(const char *phoneNumber)
     return 1;
 }
 
-void savedata() 
+void savedata()
 {
-    system("cls");
-
     struct User **sortedUsersToadd = sortUsers(users, userCount);
     struct Transition **sortedTransitionsToadd = sortTransitions(transitions, transitionCount);
+    struct Key **sortedKeysToadd = sortKeys(keys, keyCount);
 
     appendFile(datafile, sortedUsersToadd, userCount);
     appendTransitionFile(transitionfile, sortedTransitionsToadd, transitionCount);
-
-    free(sortedUsers);
-    free(sortedTransitions);
+    appendKeyFile(keyfile, sortedKeysToadd, keyCount);
 }
 
 void create_folder(const char *folder_name)
@@ -929,7 +1039,7 @@ void create_folder(const char *folder_name)
     // Check if the folder already exists
     if (access(folder_name, F_OK) != -1)
     {
-        printf("The folder (%s) is ready...\n", folder_name);
+        printf("\nThe folder (%s) is ready...\n\n", folder_name);
     }
     else
     {
@@ -940,7 +1050,7 @@ void create_folder(const char *folder_name)
         }
         else
         {
-            printf("The folder %s is successfully created...\n", folder_name);
+            printf("\nThe folder %s is successfully created...\n\n", folder_name);
         }
     }
 }
