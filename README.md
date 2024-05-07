@@ -13,7 +13,6 @@
                 <li><a href="#usage">Usage</a></li>
                 <li><a href="#version">Versions</a></li>
                 <li><a href="#explain">How it works?</a></li>
-                <li><a href="#license">License</a></li>
             </ul>
         </div>
         <section id="about">
