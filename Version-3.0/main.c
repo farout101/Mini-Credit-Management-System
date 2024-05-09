@@ -77,6 +77,14 @@ int main()
         createFile(keyfile);
     }
 
+    if(keyCount == userCount) {
+        printf("<<< keyCount = userCount (Good to go) >>>\n\n");
+    } else if (keyCount > userCount) {
+        printf("<<< Keycount is exceeding the usercount >>>\n\n");
+    } else {
+        printf("<<< Some keys are missing >>>\n\n");
+    }
+
     do
     {
         printf("---Welcome to Credit Management System---\n");
