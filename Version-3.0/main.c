@@ -7,8 +7,6 @@
 #include "avl_tree.h"
 #include "encryption.h"
 
-//Test Comment
-
 #define INITIAL_CREDITS 100
 #define INITIAL_ADMIN_CREDITS 500
 
